@@ -24,6 +24,13 @@ Ha_state ha_get_state(const char* entity_id)
   if (!http.begin(ha_url("/api/states/" + String(entity_id))))
     return result;
 
+  /* Bez tego HTTPClient trzyma keep-alive; przy odstepach ~30s miedzy
+   * odpytaniami gniazdo bywa juz zamkniete przez serwer/NAT i nastepny
+   * begin() probuje je doczyscic - stad "flush(): fail on fd, errno: 11"
+   * w logu (nieszkodliwe, ale halasliwe). Connection: close eliminuje
+   * ten wyscig. */
+  http.setReuse(false);
+
   http.addHeader("Authorization", String("Bearer ") + config::ha_token);
 
   int code = http.GET();
@@ -53,6 +60,8 @@ bool ha_call_service(const char* domain, const char* service, const char* entity
   http.setTimeout(5000);
   if (!http.begin(ha_url("/api/services/" + String(domain) + "/" + String(service))))
     return false;
+
+  http.setReuse(false);
 
   http.addHeader("Authorization", String("Bearer ") + config::ha_token);
   http.addHeader("Content-Type", "application/json");
