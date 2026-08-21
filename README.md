@@ -16,6 +16,22 @@ Zawiera tylko warstwę sprzętową: `LGFX.h` (LovyanGFX, panel RGB), `touch.h` (
    nadpisując istniejące `ui.c` / `ui.h`.
 3. `pio run` żeby zbudować.
 
+## Home Assistant
+
+`ui_Button2` (event `HA_action`, `src/ui_events.c`) wywołuje `light.toggle` na encji
+`config::ha_light_entity`. `ui_Label2` jest odświeżany co `config::ha_sensor_poll_ms`
+(domyślnie 30 s) stanem encji `config::ha_sensor_entity` (np. termometr) — patrz
+`include/ha_client.h` / `src/ha_client.cpp` (REST API HA, długożyjący token).
+
+Dane WiFi i HA (host, port, token, entity_id) są w `include/config.h` — plik jest
+gitignorowany (zawiera sekrety). Przed pierwszym buildem skopiuj szablon:
+
+```
+cp include/config.h.example include/config.h
+```
+
+i uzupełnij realnymi wartościami (token: profil użytkownika HA → "Długożyjące tokeny dostępu").
+
 ## Build
 
 ```

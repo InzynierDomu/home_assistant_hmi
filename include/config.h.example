@@ -1,0 +1,22 @@
+/**
+ * @file config.h.example
+ * @brief Template for include/config.h — copy to config.h and fill in real values.
+ *        config.h is gitignored because it holds the Wi-Fi password and HA token.
+ */
+#pragma once
+#include <Arduino.h>
+
+namespace config
+{
+constexpr char wifi_ssid[] = "YOUR_WIFI_SSID";
+constexpr char wifi_password[] = "YOUR_WIFI_PASSWORD";
+
+constexpr char ha_host[] = "homeassistant.local"; ///< Home Assistant host/IP (no scheme).
+constexpr uint16_t ha_port = 8123; ///< Home Assistant HTTP port.
+constexpr char ha_token[] = "YOUR_LONG_LIVED_ACCESS_TOKEN"; ///< Profile -> Long-lived access tokens.
+
+constexpr char ha_light_entity[] = "light.living_room"; ///< Entity toggled by Button2 (HA_action).
+constexpr char ha_sensor_entity[] = "sensor.living_room_temperature"; ///< Entity shown on ui_Label2.
+
+constexpr unsigned long ha_sensor_poll_ms = 30000; ///< How often ui_Label2 is refreshed, in ms.
+} // namespace config

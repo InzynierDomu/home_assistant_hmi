@@ -4,8 +4,9 @@
 // Project name: HA_HMI
 
 #include "ui.h"
+#include "ha_client.h"
 
 void HA_action(lv_event_t * e)
 {
-	// Your code here
+	ha_toggle_light();
 }

@@ -4,3 +4,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+
+# Wi-Fi password + HA long-lived token — copy include/config.h.example instead.
+include/config.h

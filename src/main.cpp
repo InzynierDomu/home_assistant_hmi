@@ -1,7 +1,10 @@
 #include "LGFX.h"
+#include "config.h"
+#include "ha_client.h"
 #include "ui.h"
 
 #include <Arduino.h>
+#include <WiFi.h>
 #include <lvgl.h>
 
 LGFX lcd;
@@ -48,6 +51,36 @@ void my_touchpad_read(lv_indev_drv_t* indev_driver, lv_indev_data_t* data)
   delay(15);
 }
 
+static void wifi_connect()
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(config::wifi_ssid, config::wifi_password);
+
+  Serial.print("Connecting to WiFi");
+  unsigned long wifi_start = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - wifi_start < 15000)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println(WiFi.status() == WL_CONNECTED ? " connected" : " timeout, will keep retrying");
+}
+
+static void poll_ha_sensor()
+{
+  if (WiFi.status() != WL_CONNECTED)
+    return;
+
+  Ha_state sensor = ha_get_state(config::ha_sensor_entity);
+  if (!sensor.ok)
+    return;
+
+  String text = sensor.state;
+  if (sensor.unit.length() > 0)
+    text += " " + sensor.unit;
+  lv_label_set_text(ui_Label2, text.c_str());
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -86,10 +119,21 @@ void setup()
   ui_init();
 
   lv_timer_handler();
+
+  wifi_connect();
+  poll_ha_sensor();
 }
 
 void loop()
 {
   lv_timer_handler();
   delay(5);
+
+  static unsigned long last_ha_poll = 0;
+  unsigned long now = millis();
+  if (now - last_ha_poll >= config::ha_sensor_poll_ms)
+  {
+    last_ha_poll = now;
+    poll_ha_sensor();
+  }
 }
